@@ -36,13 +36,41 @@ def main():
     # ----------------------------------------------
 
     # TODO: Call each processing function (extract_pdf_data, clean_transcript, etc.)
-    # TODO: Run quality gates (run_quality_gate) before adding to final_kb
+    # Định nghĩa danh sách các tác vụ cần thực hiện
+    tasks = [
+        ("PDF", extract_pdf_data, pdf_path),
+        ("Transcript", clean_transcript, trans_path),
+        ("HTML", parse_html_catalog, html_path),
+        ("CSV", process_sales_csv, csv_path),
+        ("Legacy Code", extract_logic_from_code, code_path)
+    ]
+
+    for name, func, path in tasks:
+        print(f"Starting ingestion for: {name}...")
+        try:
+            # Gọi hàm xử lý
+            result = func(path)
+            
+            if not result:
+                continue
+
+            # TODO: Run quality gates (run_quality_gate) before adding to final_kb
+            # Xử lý kết quả (có thể là một danh sách hoặc một dictionary đơn lẻ)
+            if isinstance(result, list):
+                for doc_dict in result:
+                    if run_quality_gate(doc_dict):
+                        final_kb.append(doc_dict)
+            else:
+                if run_quality_gate(result):
+                    final_kb.append(result)
+                    
+        except Exception as e:
+            print(f"Error processing {name} from {path}: {e}")
+
     # TODO: Save final_kb to output_path using json.dump
-    
-    # Example:
-    # doc = extract_pdf_data(pdf_path)
-    # if doc and run_quality_gate(doc):
-    #     final_kb.append(doc)
+    print(f"Saving {len(final_kb)} documents to {output_path}...")
+    with open(output_path, 'w', encoding='utf-8') as f:
+        json.dump(final_kb, f, indent=4, ensure_ascii=False)
 
     end_time = time.time()
     print(f"Pipeline finished in {end_time - start_time:.2f} seconds.")

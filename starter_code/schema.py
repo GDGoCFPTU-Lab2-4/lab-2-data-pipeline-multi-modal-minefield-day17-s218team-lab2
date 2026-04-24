@@ -1,6 +1,7 @@
-from pydantic import BaseModel, Field
-from typing import Optional, List
 from datetime import datetime
+from typing import List, Optional
+
+from pydantic import BaseModel, Field
 
 # ==========================================
 # ROLE 1: LEAD DATA ARCHITECT
@@ -8,15 +9,16 @@ from datetime import datetime
 # Your task is to define the Unified Schema for all sources.
 # This is v1. Note: A breaking change is coming at 11:00 AM!
 
+
 class UnifiedDocument(BaseModel):
-    # TODO: Define the v1 schema. 
+    # TODO: Define the v1 schema.
     # Suggested fields: document_id, content, source_type, author, timestamp, metadata
-    
+
     document_id: str
     content: str
-    source_type: str # e.g., 'PDF', 'Video', 'HTML', 'CSV', 'Code'
+    source_type: str  # e.g., 'PDF', 'Video', 'HTML', 'CSV', 'Code'
     author: Optional[str] = "Unknown"
     timestamp: Optional[datetime] = None
-    
+
     # You might want a dict for source-specific metadata
     source_metadata: dict = Field(default_factory=dict)
